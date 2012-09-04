@@ -110,6 +110,8 @@ ADD_CUSTOM_COMMAND(
     COMMAND javac ${CMAKE_SOURCE_DIR}/java-api/src/transcode/*.java -d ${CMAKE_SOURCE_DIR}/java-api/bin/
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/java-api/bin/ ${CMAKE_SOURCE_DIR}/build/
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_SOURCE_DIR}/build/ jar cvf transcode.jar transcode *.so
+    COMMAND g++ -c ${CMAKE_SOURCE_DIR}/test/*.cpp
+    COMMAND g++ -L. -ltranscode `pkg-config --libs libavcodec` -o TestTranscode *.o 
 )
 ENDIF()
 
