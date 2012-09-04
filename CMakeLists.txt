@@ -48,11 +48,8 @@ SET(DBG_LIBS ${DBG_LIBS} ${avcodec_DBG_LIBRARY} ${avutil_DBG_LIBRARY})
 
 # Source files for the precol library
 SET (SOURCEFILES src/flv.cpp src/transcode.cpp src/transcode_wrap.cpp)
-IF(WIN32)
 ADD_LIBRARY(transcode SHARED ${SOURCEFILES})
-ELSE()
-ADD_LIBRARY(transcode ${SOURCEFILES})
-ENDIF()
+
 # I am not sure whether we still need these
 IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
   SET_TARGET_PROPERTIES(transcode PROPERTIES COMPILE_FLAGS "-fPIC")
@@ -83,9 +80,7 @@ ENDIF(PLATFORM STREQUAL "x64")
 EXPORT (TARGETS transcode FILE transcode-targets.cmake)
 
 # Adding tests to compilation, if needed
-#IF(WITH_TEST)
-#   ADD_SUBDIRECTORY( test )
-#ENDIF(WITH_TEST)
+IF(WIN32)
 ADD_EXECUTABLE(TestTranscode test/TestTranscode.cpp)
 
 SET(COMMON_LIBS transcode)
@@ -96,6 +91,8 @@ ENDFOREACH(L)
 FOREACH(L ${COMMON_DBG_LIBS})
 	TARGET_LINK_LIBRARIES(TestTranscode debug ${L})
 ENDFOREACH(L)
+ENDIF()
+
 IF(WIN32)
 ADD_CUSTOM_COMMAND(
     TARGET transcode
@@ -115,3 +112,4 @@ ADD_CUSTOM_COMMAND(
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_SOURCE_DIR}/build/ jar cvf transcode.jar transcode *.so
 )
 ENDIF()
+

@@ -41,10 +41,10 @@ public class Test {
 	}
 	
 	public static void main(String argv[]) {
-		//System.loadLibrary("transcode");
-		String dllPath = System.getProperty("user.dir") + "/transcode.dll";
-		System.out.println(dllPath);
-		System.load(dllPath);
+		System.loadLibrary("transcode");
+		//String dllPath = System.getProperty("user.dir") + "/transcode.dll";
+		//System.out.println(dllPath);
+		//System.load(dllPath);
 		
 		Date date = new Date();
 		long startTime = date.getTime();
