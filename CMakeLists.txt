@@ -23,14 +23,20 @@ INCLUDE_DIRECTORIES(${ffmpeg_INCLUDE_DIRS})
 # Directories where we find header files
 ##########################################################################################
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/jni")
+IF(WIN32)
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/jni/win32")
+ELSE()
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/jni/linux")
+ENDIF(WIN32)
+
 ##########################################################################################
 
-
+MESSAGE("${avcodec_LIBRARY} ${avutil_LIBRARY}")
 ##########################################################################################
 # We now list all dependencies, for both debug and release modes
 ##########################################################################################
-SET(LIBS ${LIBS} ${ffmpeg_LIBRARIES})
-SET(DBG_LIBS ${DBG_LIBS} ${ffmpeg_DBG_LIBRARIES})
+SET(LIBS ${LIBS} ${avcodec_LIBRARY} ${avutil_LIBRARY})
+SET(DBG_LIBS ${DBG_LIBS} ${avcodec_DBG_LIBRARY} ${avutil_DBG_LIBRARY})
 
 #IF(WIN32)
 #  SET(X64_LIBS ${X64_LIBS} ${ffmpeg_X64_LIBRARIES})
@@ -42,9 +48,11 @@ SET(DBG_LIBS ${DBG_LIBS} ${ffmpeg_DBG_LIBRARIES})
 
 # Source files for the precol library
 SET (SOURCEFILES src/flv.cpp src/transcode.cpp src/transcode_wrap.cpp)
-
+IF(WIN32)
 ADD_LIBRARY(transcode SHARED ${SOURCEFILES})
-
+ELSE()
+ADD_LIBRARY(transcode ${SOURCEFILES})
+ENDIF()
 # I am not sure whether we still need these
 IF( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
   SET_TARGET_PROPERTIES(transcode PROPERTIES COMPILE_FLAGS "-fPIC")
@@ -88,7 +96,7 @@ ENDFOREACH(L)
 FOREACH(L ${COMMON_DBG_LIBS})
 	TARGET_LINK_LIBRARIES(TestTranscode debug ${L})
 ENDFOREACH(L)
-
+IF(WIN32)
 ADD_CUSTOM_COMMAND(
     TARGET transcode
 	POST_BUILD
@@ -98,3 +106,12 @@ ADD_CUSTOM_COMMAND(
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/java-api/bin/ ${CMAKE_SOURCE_DIR}/build/${CMAKE_CFG_INTDIR}/
 	COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_SOURCE_DIR}/build/${CMAKE_CFG_INTDIR}/ jar cvf transcode.jar transcode *.dll
 )
+ELSE()
+ADD_CUSTOM_COMMAND(
+    TARGET transcode
+    POST_BUILD
+    COMMAND javac ${CMAKE_SOURCE_DIR}/java-api/src/transcode/*.java -d ${CMAKE_SOURCE_DIR}/java-api/bin/
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/java-api/bin/ ${CMAKE_SOURCE_DIR}/build/
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_SOURCE_DIR}/build/ jar cvf transcode.jar transcode *.so
+)
+ENDIF()

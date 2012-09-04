@@ -17,7 +17,7 @@
  *
  */
 #include "flv.h"
-
+#include <string.h>
 //#include <sstream>
 
 #define FLVHEADSIZE 9

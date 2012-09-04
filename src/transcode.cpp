@@ -1,13 +1,18 @@
 // transcode.cpp : Defines the entry point for the console application.
 //
 //#include "stdafx.h"
+#ifdef WIN32
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
 #include <libavcodec/avcodec.h>
-__declspec(dllexport) char* flv2mp3(char* src, int src_len, int* dst_len);
-__declspec(dllexport) char* multiflv2mp3(char* src, int* src_len, int src_size, int* dst_len);
-__declspec(dllexport) char* raw2flv(char* src, int src_len, int* dst_len);
+EXPORT char* flv2mp3(char* src, int src_len, int* dst_len);
+EXPORT char* multiflv2mp3(char* src, int* src_len, int src_size, int* dst_len);
+EXPORT char* raw2flv(char* src, int src_len, int* dst_len);
 #ifdef __cplusplus
 }
 #endif
